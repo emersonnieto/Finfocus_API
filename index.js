@@ -7,7 +7,7 @@ const express_1 = __importDefault(require("express"));
 const mysql_1 = require("mysql");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
-// Configurações do pool de conexões
+
 const pool = (0, mysql_1.createPool)({
     connectionLimit: 10,
     host: 'localhost',
@@ -15,10 +15,10 @@ const pool = (0, mysql_1.createPool)({
     password: '19930926',
     database: 'finfocusdb',
 });
-// Rota para cadastrar um novo usuário
+
 app.post('/cadastro', (req, res) => {
     const { name, email, password } = req.body;
-    // Obtém uma conexão do pool
+
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Erro ao obter conexão do pool:', err);
@@ -27,7 +27,7 @@ app.post('/cadastro', (req, res) => {
         }
         const sqlInsertUser = 'INSERT INTO user (name, email, password) VALUES (?, ?, ?)';
         connection.query(sqlInsertUser, [name, email, password], (err) => {
-            connection.release(); // Libera a conexão de volta para o pool
+            connection.release(); 
             if (err) {
                 console.error('Erro ao inserir usuário:', err);
                 res.status(500).send('Erro ao cadastrar usuário');
@@ -37,10 +37,10 @@ app.post('/cadastro', (req, res) => {
         });
     });
 });
-// Rota para realizar o login do usuário
+
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-    // Obtém uma conexão do pool
+
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Erro ao obter conexão do pool:', err);
