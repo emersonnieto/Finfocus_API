@@ -7,7 +7,6 @@ const express_1 = __importDefault(require("express"));
 const mysql_1 = require("mysql");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
-
 const pool = (0, mysql_1.createPool)({
     connectionLimit: 10,
     host: 'localhost',
@@ -15,10 +14,8 @@ const pool = (0, mysql_1.createPool)({
     password: '19930926',
     database: 'finfocusdb',
 });
-
 app.post('/cadastro', (req, res) => {
     const { name, email, password } = req.body;
-
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Erro ao obter conexão do pool:', err);
@@ -27,7 +24,7 @@ app.post('/cadastro', (req, res) => {
         }
         const sqlInsertUser = 'INSERT INTO user (name, email, password) VALUES (?, ?, ?)';
         connection.query(sqlInsertUser, [name, email, password], (err) => {
-            connection.release(); 
+            connection.release();
             if (err) {
                 console.error('Erro ao inserir usuário:', err);
                 res.status(500).send('Erro ao cadastrar usuário');
@@ -37,10 +34,8 @@ app.post('/cadastro', (req, res) => {
         });
     });
 });
-
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Erro ao obter conexão do pool:', err);
@@ -49,7 +44,7 @@ app.post('/login', (req, res) => {
         }
         const sqlLoginUser = 'SELECT id FROM user WHERE email = ? AND password = ?';
         connection.query(sqlLoginUser, [email, password], (err, results) => {
-            connection.release(); // Libera a conexão de volta para o pool
+            connection.release();
             if (err) {
                 console.error('Erro ao autenticar usuário:', err);
                 res.status(500).send('Erro ao autenticar usuário');
@@ -64,7 +59,7 @@ app.post('/login', (req, res) => {
         });
     });
 });
-// Inicia o servidor na porta 3000
+//teste
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
 });
