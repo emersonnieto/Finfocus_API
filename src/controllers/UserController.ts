@@ -1,22 +1,11 @@
-import express, { Request, Response } from 'express';
-import { createPool, Pool, MysqlError } from 'mysql';
+import { Pool, createPool, MysqlError } from 'mysql';
+import dbConfig from '../database';
+import { Request, Response } from 'express';
 
-const app = express();
-app.use(express.json());
+const pool: Pool = createPool(dbConfig);
 
-
-const pool: Pool = createPool({
-  connectionLimit: 10,
-  host: 'localhost',
-  user: 'root',
-  password: '19930926',
-  database: 'finfocusdb',
-});
-
-
-app.post('/cadastro', (req: Request, res: Response) => {
+export const createUser = (req: Request, res: Response) => {
   const { name, email, password } = req.body;
-
 
   pool.getConnection((err: MysqlError | null, connection) => {
     if (err) {
@@ -27,7 +16,7 @@ app.post('/cadastro', (req: Request, res: Response) => {
 
     const sqlInsertUser = 'INSERT INTO user (name, email, password) VALUES (?, ?, ?)';
     connection.query(sqlInsertUser, [name, email, password], (err: MysqlError | null) => {
-      connection.release(); 
+      connection.release();
 
       if (err) {
         console.error('Erro ao inserir usuário:', err);
@@ -38,13 +27,11 @@ app.post('/cadastro', (req: Request, res: Response) => {
       res.send('Usuário cadastrado com sucesso!');
     });
   });
-});
+};
 
-
-app.post('/login', (req: Request, res: Response) => {
+export const loginUser = (req: Request, res: Response) => {
   const { email, password } = req.body;
 
- 
   pool.getConnection((err: MysqlError | null, connection) => {
     if (err) {
       console.error('Erro ao obter conexão do pool:', err);
@@ -54,7 +41,7 @@ app.post('/login', (req: Request, res: Response) => {
 
     const sqlLoginUser = 'SELECT id FROM user WHERE email = ? AND password = ?';
     connection.query(sqlLoginUser, [email, password], (err: MysqlError | null, results: any[]) => {
-      connection.release(); 
+      connection.release();
 
       if (err) {
         console.error('Erro ao autenticar usuário:', err);
@@ -69,9 +56,4 @@ app.post('/login', (req: Request, res: Response) => {
       }
     });
   });
-});
-
-//teste
-app.listen(3000, () => {
-  console.log('Servidor rodando na porta 3000');
-});
+};
